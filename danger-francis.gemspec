@@ -8,10 +8,10 @@ Gem::Specification.new do |spec|
   spec.name          = "danger-francis"
   spec.version       = Francis::VERSION
   spec.authors       = ["Marcin Siemaszko"]
-  spec.email         = ["siemman@gmail.com"]
-  spec.description   = "A short description of danger-francis."
-  spec.summary       = "A longer description of danger-francis."
-  spec.homepage      = "https://github.com/Marcin Siemaszko/danger-francis"
+  spec.email         = ["marcin.siemaszko@netguru.com"]
+  spec.description   = "Plugin that allows reporting data to Francis"
+  spec.summary       = "Francis is Netguru internal tool for monitoring technical status of projects. This plugin reports data to our system."
+  spec.homepage      = "https://github.com/netguru/danger-francis"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
