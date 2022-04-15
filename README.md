@@ -75,3 +75,6 @@ Currently for iOS those values are calculated based on cocoapods and carthage re
 3. Run `bundle exec rake spec` to run the tests.
 4. Use `bundle exec guard` to automatically have tests run as you make changes.
 5. Make your changes.
+
+### Team
+Owner & Maintainer: [@Siemian](https://github.com/Siemian/) 

@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
 require "typhoeus"
-require_relative "ios_outdated.rb"
+require_relative "ios_outdated"
 
 module Danger
   # This plugin allows uploading data to Francis
   # @see  netguru/danger-francis
   #
   class DangerFrancis < Plugin
-
     # Url of the endpoint where report will be sent
     attr_accessor :reporting_url
 
@@ -50,6 +49,7 @@ module Danger
       unless build_time.nil?
         return build_time
       end
+
       build_start_timestamp = ENV["BITRISE_BUILD_TRIGGER_TIMESTAMP"]
       if ci_type == "bitrise" && !build_start_timestamp.nil?
         current_timestamp = Time.now.to_i
@@ -60,12 +60,13 @@ module Danger
 
     def dependencies_report
       unless dependencies_count.nil? || outdated_dependencies_count.nil?
-        return {total: dependencies_count, outdated: outdated_dependencies_count}
+        return { total: dependencies_count, outdated: outdated_dependencies_count }
       end
       if stack == "ios"
         return ios_outdated_dependencies
       end
-      return {total: 0, outdated: 0}
+
+      return { total: 0, outdated: 0 }
     end
 
     ### Methods
@@ -124,7 +125,7 @@ module Danger
         headers: {}
       )
       resp = request.run
-      if !resp.success?
+      unless resp.success?
         warn("Send failed with code: " + resp.code.to_s + " body: " + resp.body)
       end
     end
