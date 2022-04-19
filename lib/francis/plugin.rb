@@ -2,6 +2,7 @@
 
 require "typhoeus"
 require_relative "ios_outdated"
+require_relative "gem_version"
 
 module Danger
   # This plugin allows uploading data to Francis
@@ -96,7 +97,7 @@ module Danger
         "ci_data": {
           "build_time": build_time_value
         },
-        pluginVersion: Francis::VERSION
+        "pluginVersion": Francis::VERSION
       }
       puts json
 
