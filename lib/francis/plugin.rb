@@ -85,7 +85,7 @@ module Danger
 
       json = {
         "project_id": project_id,
-        "code_coverage": coverage,
+        "code_coverage": coverage.to_f,
         "linter_result": {
           "errors": lint_errors,
           "warnings": lint_warnings
@@ -122,8 +122,8 @@ module Danger
       request = Typhoeus::Request.new(
         reporting_url,
         method: :post,
-        body: json,
-        headers: {}
+        body: JSON.dump(json),
+        headers: {"Content-Type": "application/json"}
       )
       resp = request.run
       unless resp.success?
