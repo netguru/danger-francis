@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def ios_outdated_dependencies
   pods = check_pods_dependencies
   carthage = check_carthage_dependencies
@@ -28,7 +30,7 @@ def check_pods_dependencies
       cocoapods_message = cocoapods_message[index...cocoapods_message.size]
       outdated_dependencies_count += cocoapods_message.lines.count - 1
     end
-    message "Cocoapods: " + cocoapods_message
+    message "Cocoapods: #{cocoapods_message}"
   end
   return { total: total_dependencies_count, outdated: outdated_dependencies_count }
 end
@@ -51,7 +53,7 @@ def check_carthage_dependencies
       carthage_message = carthage_message[index...carthage_message.size]
       outdated_dependencies_count += carthage_message.lines.count - 1
     end
-    message "Carthage: " + carthage_message
+    message "Carthage: #{carthage_message}"
   end
   return { total: total_dependencies_count, outdated: outdated_dependencies_count }
 end
