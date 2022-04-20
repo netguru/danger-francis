@@ -2,6 +2,7 @@
 
 require "typhoeus"
 require_relative "ios_outdated"
+require_relative "flutter_outdated"
 require_relative "gem_version"
 
 module Danger
@@ -37,11 +38,11 @@ module Danger
     attr_accessor :build_time
 
     # Number of dependencies used in the project[optional]
-    # Automatically calculated when stack = ios
+    # Automatically calculated when stack = ios or flutter
     attr_accessor :dependencies_count
 
     # Number of outdated dependencies used in the project[optional]
-    # Automatically calculated when stack = ios
+    # Automatically calculated when stack = ios or flutter
     attr_accessor :outdated_dependencies_count
 
     ### Calculated properties
@@ -63,8 +64,12 @@ module Danger
       unless dependencies_count.nil? || outdated_dependencies_count.nil?
         return { total: dependencies_count, outdated: outdated_dependencies_count }
       end
-      if stack == "ios"
+
+      case stack
+      when "ios"
         return ios_outdated_dependencies
+      when "flutter"
+        return flutter_outdated_dependencies
       end
 
       return { total: 0, outdated: 0 }
@@ -78,10 +83,10 @@ module Danger
       check_properties
       dependencies = dependencies_report
       message "Sending project state-of-health report to Francis"
-      message "Code coverage: " + coverage.to_s
-      message "Linter errors: " + lint_errors.to_s + " and warnings: " + lint_warnings.to_s
-      message "Build time: " + (build_time_value / 60).to_i.to_s + "min"
-      message "Total outdated dependencies count: " + dependencies[:total].to_s + " (out of " + dependencies[:outdated].to_s + " in total)"
+      message "Code coverage: #{coverage}"
+      message "Linter errors: #{lint_errors} and warnings: #{lint_warnings}"
+      message "Build time: #{(build_time_value / 60).to_i}min"
+      message "Total outdated dependencies count: #{dependencies[:outdated]} (out of #{dependencies[:total]} in total)"
 
       json = {
         "project_id": project_id,
@@ -104,7 +109,7 @@ module Danger
       begin
         send_francis_request(json)
       rescue StandardError => e
-        message "Data NOT sent to Francis due to error: " + e.message
+        message "Data NOT sent to Francis due to error: #{e.message}"
       end
     end
 
@@ -123,11 +128,11 @@ module Danger
         reporting_url,
         method: :post,
         body: JSON.dump(json),
-        headers: {"Content-Type": "application/json"}
+        headers: { "Content-Type": "application/json" }
       )
       resp = request.run
       unless resp.success?
-        warn("Send failed with code: " + resp.code.to_s + " body: " + resp.body)
+        warn("Send failed with code: #{resp.code} body: #{resp.body}")
       end
     end
 
