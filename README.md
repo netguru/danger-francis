@@ -11,7 +11,7 @@ Francis is Netguru internal tool for monitoring technical status of projects. Th
     Methods and attributes from this plugin are available in
     your `Dangerfile` under the `francis` namespace.
 
-### Attributes
+#### Attributes
 
 `reporting_url` - Url of the endpoint where report will be sent
 
@@ -33,10 +33,10 @@ Available values: bitrise, circleci
 Automatically calculated when ci_type = bitrise
 
 `dependencies_count` - Number of dependencies used in the project[optional]
-Automatically calculated when stack = ios
+Automatically calculated when stack = ios, flutter or android
 
 `outdated_dependencies_count` - Number of outdated dependencies used in the project[optional]
-Automatically calculated when stack = ios
+Automatically calculated when stack = ios, flutter or android
 
 
 ### Methods
@@ -77,4 +77,4 @@ Currently for iOS those values are calculated based on cocoapods and carthage re
 5. Make your changes.
 
 ### Team
-Owner & Maintainer: [@Siemian](https://github.com/Siemian/) 
+Owner & Maintainer: [@Siemian](https://github.com/Siemian/)
