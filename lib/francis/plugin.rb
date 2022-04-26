@@ -86,10 +86,11 @@ module Danger
       check_properties
       dependencies = dependencies_report
       message "Sending project state-of-health report to Francis"
-      message "Code coverage: #{coverage.round(2)}"
-      message "Linter errors: #{lint_errors} and warnings: #{lint_warnings}"
+      message "Code coverage: #{coverage.round(2)}%"
+      message "Linter errors: #{lint_errors}"
+      message "Linter warnings: #{lint_warnings}"
       message "Build time: #{(build_time_value / 60).to_i}min"
-      message "Total outdated dependencies count: #{dependencies[:outdated]} (out of #{dependencies[:total]} in total)"
+      message "Outdated dependencies count: #{dependencies[:outdated]} (out of #{dependencies[:total]} in total)"
 
       json = {
         "project_id": project_id,
