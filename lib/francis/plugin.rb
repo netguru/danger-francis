@@ -3,6 +3,7 @@
 require "typhoeus"
 require_relative "ios_outdated"
 require_relative "flutter_outdated"
+require_relative "android_outdated"
 require_relative "gem_version"
 
 module Danger
@@ -38,11 +39,11 @@ module Danger
     attr_accessor :build_time
 
     # Number of dependencies used in the project[optional]
-    # Automatically calculated when stack = ios or flutter
+    # Automatically calculated when stack = ios, flutter or android
     attr_accessor :dependencies_count
 
     # Number of outdated dependencies used in the project[optional]
-    # Automatically calculated when stack = ios or flutter
+    # Automatically calculated when stack = ios, flutter or android
     attr_accessor :outdated_dependencies_count
 
     ### Calculated properties
@@ -70,6 +71,8 @@ module Danger
         return ios_outdated_dependencies
       when "flutter"
         return flutter_outdated_dependencies
+      when "android"
+        return android_outdated_dependencies
       end
 
       return { total: 0, outdated: 0 }
@@ -83,10 +86,11 @@ module Danger
       check_properties
       dependencies = dependencies_report
       message "Sending project state-of-health report to Francis"
-      message "Code coverage: #{coverage}"
-      message "Linter errors: #{lint_errors} and warnings: #{lint_warnings}"
+      message "Code coverage: #{coverage.round(2)}%"
+      message "Linter errors: #{lint_errors}"
+      message "Linter warnings: #{lint_warnings}"
       message "Build time: #{(build_time_value / 60).to_i}min"
-      message "Total outdated dependencies count: #{dependencies[:outdated]} (out of #{dependencies[:total]} in total)"
+      message "Outdated dependencies count: #{dependencies[:outdated]} (out of #{dependencies[:total]} in total)"
 
       json = {
         "project_id": project_id,
