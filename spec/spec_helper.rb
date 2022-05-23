@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require 'simplecov'
+SimpleCov.start
 
 require "pathname"
 ROOT = Pathname.new(File.expand_path("..", __dir__))

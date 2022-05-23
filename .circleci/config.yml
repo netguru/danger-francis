@@ -12,22 +12,23 @@ jobs:
       - checkout
       - run: gem install bundler:2.2.10
       - run: bundle install
-      - run: bundle exec rake spec
       - run:
-          name: Setup dependencies
+          name: Run Tests
           command: |
-            sudo composer self-update
-            composer install -n --prefer-dist
+            set -e
+            bundle exec rspec $(circleci tests glob "spec/**/**/*_spec.rb" | circleci tests split --split-by=timings) \
+                              --format progress \
+                              --format RspecJunitFormatter \
+                              --out test_results/rspec.xml
+            ./tmp/cc-test-reporter format-coverage --prefix /app -t simplecov -o tmp/test-results/codeclimate.$(echo $CIRCLE_NODE_INDEX).json public/coverage/.resultset.json
       - run:
-          name: Setup Code Climate test-reporter
+          name: Download CC test reporter
           command: |
-            # download test reporter as a static binary
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
+            mkdir -p ./tmp
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
+            chmod +x ./tmp/cc-test-reporter
       - run:
-          name: Run tests
+          name: Upload coverage results to Code Climate
           command: |
-            sudo docker-php-ext-enable xdebug
-            ./cc-test-reporter before-build
-            sudo vendor/bin/phpunit --coverage-clover clover.xml
-            ./cc-test-reporter after-build --coverage-input-type clover --exit-code $?
+            ./tmp/cc-test-reporter sum-coverage tmp/test-results/codeclimate.*.json -p 5 -o tmp/test-results/codeclimate.total.json
+            ./tmp/cc-test-reporter upload-coverage -i tmp/test-results/codeclimate.total.json
