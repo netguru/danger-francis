@@ -94,6 +94,25 @@ module Danger
       return { total: 0, outdated: 0 }
     end
 
+    def request_json
+      {
+        "project_id": project_id,
+        "code_coverage": coverage.to_f,
+        "linter_result": {
+          "errors": lint_errors,
+          "warnings": lint_warnings
+        },
+        "dependencies": {
+           "count": dependencies_report[:total],
+           "outdated_count": dependencies_report[:outdated]
+        },
+        "ci_data": {
+          "build_time": build_time_value
+        },
+        "pluginVersion": Francis::VERSION
+      }
+    end
+
     ### Methods
 
     # Sends the report to Francis
@@ -107,41 +126,27 @@ module Danger
       message "Linter errors: #{lint_errors}"
       message "Linter warnings: #{lint_warnings}"
       message "Build time: #{(build_time_value / 60).to_i}min"
-      message "Outdated dependencies count: #{dependencies[:outdated]} (out of #{dependencies[:total]} in total)"
-
-      json = {
-        "project_id": project_id,
-        "code_coverage": coverage.to_f,
-        "linter_result": {
-          "errors": lint_errors,
-          "warnings": lint_warnings
-        },
-        "dependencies": {
-           "count": dependencies[:total],
-           "outdated_count": dependencies[:outdated]
-        },
-        "ci_data": {
-          "build_time": build_time_value
-        },
-        "pluginVersion": Francis::VERSION
-      }
-      puts json
+      message "Outdated dependencies count: #{dependencies_report[:outdated]} (out of #{dependencies_report[:total]} in total)"
 
       begin
-        send_francis_request(json)
+        send_francis_request(request_json)
       rescue StandardError => e
         message "Data NOT sent to Francis due to error: #{e.message}"
       end
     end
 
     def check_properties
-      raise DangerFrancisError, "reporting_url property is empty" if reporting_url.nil?
-      raise DangerFrancisError, "stack property is empty" if stack.nil?
-      raise DangerFrancisError, "ci_type property is empty" if ci_type.nil?
-      raise DangerFrancisError, "project_id property is empty" if project_id.nil?
-      raise DangerFrancisError, "coverage property is empty" if coverage.nil?
-      raise DangerFrancisError, "lint_errors property is empty" if lint_errors.nil?
-      raise DangerFrancisError, "lint_warnings property is empty" if lint_warnings.nil?
+      check_property(:reporting_url)
+      check_property(:stack)
+      check_property(:ci_type)
+      check_property(:project_id)
+      check_property(:coverage)
+      check_property(:lint_errors)
+      check_property(:lint_warnings)
+    end
+
+    def check_property(property)
+      raise DangerFrancisError, "#{property} property is empty" if eval(property.to_s).nil?
     end
 
     def send_francis_request(json)
@@ -157,6 +162,6 @@ module Danger
       end
     end
 
-    private :build_time_value, :send_francis_request, :dependencies_report, :check_properties
+    private :build_time_value, :send_francis_request, :dependencies_report, :check_properties, :request_json
   end
 end
