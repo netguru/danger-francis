@@ -13,6 +13,19 @@ module Danger
   # This plugin allows uploading data to Francis
   # @see  netguru/danger-francis
   #
+  # @example Base configuration needed for sending report
+  #
+  #          francis.reporting_url = "https://correct.address.com/api/francis"
+  #          francis.stack = "ios"
+  #          francis.ci_type = "bitrise"
+  #          francis.project_id = "uuid"
+  #          francis.coverage = 12
+  #          francis.lint_errors = 10
+  #          francis.lint_warnings = 21
+  #          francis.send_report # sends the report
+  #
+  # @tags netguru, francis, quality
+  #
   class DangerFrancis < Plugin
     # Url of the endpoint where report will be sent
     attr_accessor :reporting_url
@@ -85,6 +98,7 @@ module Danger
 
     # Sends the report to Francis
     #
+    # @return  [void]
     def send_report
       check_properties
       dependencies = dependencies_report
