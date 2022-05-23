@@ -4,6 +4,7 @@
 
 AllCops:
   TargetRubyVersion: 2.6
+  NewCops: disable
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
@@ -145,4 +146,7 @@ Style/PercentLiteralDelimiters:
     "%x": ()
 
 Security/YAMLLoad:
+  Enabled: false
+
+Gemspec/RequiredRubyVersion:
   Enabled: false

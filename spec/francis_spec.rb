@@ -8,39 +8,49 @@ module Danger
       expect(Danger::DangerFrancis.new(nil)).to be_a Danger::Plugin
     end
 
-    #
-    # You should test your custom attributes and methods here
-    #
     describe "with Dangerfile" do
       before do
         @dangerfile = testing_dangerfile
         @my_plugin = @dangerfile.francis
-
-        # mock the PR data
-        # you can then use this, eg. github.pr_author, later in the spec
-        json = File.read("#{File.dirname(__FILE__)}/support/fixtures/github_pr.json") # example json: `curl https://api.github.com/repos/danger/danger-plugin-template/pulls/18 > github_pr.json`
-        allow(@my_plugin.github).to receive(:pr_json).and_return(json)
       end
 
-      # Some examples for writing tests
-      # You should replace these with your own.
+      it "Errors are raised when values are not passed" do
+        expect do
+          @my_plugin.send_report
+        end.to raise_error(DangerFrancisError, "reporting_url property is empty")
 
-      it "Warns on a monday" do
-        monday_date = Date.parse("2016-07-11")
-        allow(Date).to receive(:today).and_return monday_date
+        @my_plugin.reporting_url = "fixture"
+        expect do
+          @my_plugin.send_report
+        end.to raise_error(DangerFrancisError, "stack property is empty")
 
-        @my_plugin.warn_on_mondays
+        @my_plugin.stack = "ios"
+        expect do
+          @my_plugin.send_report
+        end.to raise_error(DangerFrancisError, "ci_type property is empty")
 
-        expect(@dangerfile.status_report[:warnings]).to eq(["Trying to merge code on a Monday"])
-      end
+        @my_plugin.ci_type = "CircleCI"
+        expect do
+          @my_plugin.send_report
+        end.to raise_error(DangerFrancisError, "project_id property is empty")
 
-      it "Does nothing on a tuesday" do
-        monday_date = Date.parse("2016-07-12")
-        allow(Date).to receive(:today).and_return monday_date
+        @my_plugin.project_id = "fixture"
+        expect do
+          @my_plugin.send_report
+        end.to raise_error(DangerFrancisError, "coverage property is empty")
 
-        @my_plugin.warn_on_mondays
+        @my_plugin.coverage = 0
+        expect do
+          @my_plugin.send_report
+        end.to raise_error(DangerFrancisError, "lint_errors property is empty")
 
-        expect(@dangerfile.status_report[:warnings]).to eq([])
+        @my_plugin.lint_errors = 0
+        expect do
+          @my_plugin.send_report
+        end.to raise_error(DangerFrancisError, "lint_warnings property is empty")
+
+        @my_plugin.lint_warnings = 0
+        @my_plugin.send_report
       end
     end
   end

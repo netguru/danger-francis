@@ -7,8 +7,24 @@ require_relative "android_outdated"
 require_relative "gem_version"
 
 module Danger
+  class DangerFrancisError < StandardError
+  end
+
   # This plugin allows uploading data to Francis
   # @see  netguru/danger-francis
+  #
+  # @example Base configuration needed for sending report
+  #
+  #          francis.reporting_url = "https://correct.address.com/api/francis"
+  #          francis.stack = "ios"
+  #          francis.ci_type = "bitrise"
+  #          francis.project_id = "uuid"
+  #          francis.coverage = 12
+  #          francis.lint_errors = 10
+  #          francis.lint_warnings = 21
+  #          francis.send_report # sends the report
+  #
+  # @tags netguru, francis, quality
   #
   class DangerFrancis < Plugin
     # Url of the endpoint where report will be sent
@@ -82,6 +98,7 @@ module Danger
 
     # Sends the report to Francis
     #
+    # @return  [void]
     def send_report
       check_properties
       dependencies = dependencies_report
@@ -118,13 +135,13 @@ module Danger
     end
 
     def check_properties
-      throw "reporting_url property is empty" if reporting_url.nil?
-      throw "stack property is empty" if stack.nil?
-      throw "ci_type property is empty" if ci_type.nil?
-      throw "project_id property is empty" if project_id.nil?
-      throw "coverage property is empty" if coverage.nil?
-      throw "lint_errors property is empty" if lint_errors.nil?
-      throw "lint_warnings property is empty" if lint_warnings.nil?
+      raise DangerFrancisError, "reporting_url property is empty" if reporting_url.nil?
+      raise DangerFrancisError, "stack property is empty" if stack.nil?
+      raise DangerFrancisError, "ci_type property is empty" if ci_type.nil?
+      raise DangerFrancisError, "project_id property is empty" if project_id.nil?
+      raise DangerFrancisError, "coverage property is empty" if coverage.nil?
+      raise DangerFrancisError, "lint_errors property is empty" if lint_errors.nil?
+      raise DangerFrancisError, "lint_warnings property is empty" if lint_warnings.nil?
     end
 
     def send_francis_request(json)
