@@ -13,6 +13,12 @@ jobs:
       - run: gem install bundler:2.2.10
       - run: bundle install
       - run:
+          name: Download CC test reporter
+          command: |
+            mkdir -p ./tmp
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
+            chmod +x ./tmp/cc-test-reporter
+      - run:
           name: Run Tests
           command: |
             set -e
@@ -20,12 +26,6 @@ jobs:
                               --format progress \
                               --out test_results/rspec.xml
             ./tmp/cc-test-reporter format-coverage --prefix /app -t simplecov -o tmp/test-results/codeclimate.$(echo $CIRCLE_NODE_INDEX).json public/coverage/.resultset.json
-      - run:
-          name: Download CC test reporter
-          command: |
-            mkdir -p ./tmp
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./tmp/cc-test-reporter
-            chmod +x ./tmp/cc-test-reporter
       - run:
           name: Upload coverage results to Code Climate
           command: |
