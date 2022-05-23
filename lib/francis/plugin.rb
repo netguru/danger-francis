@@ -82,16 +82,18 @@ module Danger
         return { total: dependencies_count, outdated: outdated_dependencies_count }
       end
 
+      result = { total: 0, outdated: 0 }
+
       case stack
       when "ios"
-        return ios_outdated_dependencies
+        result = ios_outdated_dependencies
       when "flutter"
-        return flutter_outdated_dependencies
+        result = flutter_outdated_dependencies
       when "android"
         return android_outdated_dependencies
       end
 
-      return { total: 0, outdated: 0 }
+      return result
     end
 
     def request_json
@@ -120,7 +122,6 @@ module Danger
     # @return  [void]
     def send_report
       check_properties
-      dependencies = dependencies_report
       message "Sending project state-of-health report to Francis"
       message "Code coverage: #{coverage.round(2)}%"
       message "Linter errors: #{lint_errors}"
@@ -146,7 +147,7 @@ module Danger
     end
 
     def check_property(property)
-      raise DangerFrancisError, "#{property} property is empty" if eval(property.to_s).nil?
+      raise DangerFrancisError, "#{property} property is empty" if send(property.to_s).nil?
     end
 
     def send_francis_request(json)
