@@ -6,3 +6,4 @@ source "https://rubygems.org"
 gemspec
 gem "typhoeus", "~> 1.4.0"
 gem 'simplecov', require: false, group: :test
+gem 'rspec_junit_formatter'
