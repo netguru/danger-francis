@@ -1,0 +1,13 @@
+version: 2.1
+orbs:
+  ruby: circleci/ruby@1.0
+
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.7
+    steps:
+      - checkout
+      - run: gem install bundler:2.2.10
+      - run: bundle install
+      - run: bundle exec rake spec
