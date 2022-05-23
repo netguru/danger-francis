@@ -7,9 +7,9 @@ require_relative "android_outdated"
 require_relative "gem_version"
 
 module Danger
-
   class DangerFrancisError < StandardError
   end
+
   # This plugin allows uploading data to Francis
   # @see  netguru/danger-francis
   #
@@ -121,13 +121,13 @@ module Danger
     end
 
     def check_properties
-      raise DangerFrancisError.new "reporting_url property is empty" if reporting_url.nil?
-      raise DangerFrancisError.new "stack property is empty" if stack.nil?
-      raise DangerFrancisError.new "ci_type property is empty" if ci_type.nil?
-      raise DangerFrancisError.new "project_id property is empty" if project_id.nil?
-      raise DangerFrancisError.new "coverage property is empty" if coverage.nil?
-      raise DangerFrancisError.new "lint_errors property is empty" if lint_errors.nil?
-      raise DangerFrancisError.new "lint_warnings property is empty" if lint_warnings.nil?
+      raise DangerFrancisError, "reporting_url property is empty" if reporting_url.nil?
+      raise DangerFrancisError, "stack property is empty" if stack.nil?
+      raise DangerFrancisError, "ci_type property is empty" if ci_type.nil?
+      raise DangerFrancisError, "project_id property is empty" if project_id.nil?
+      raise DangerFrancisError, "coverage property is empty" if coverage.nil?
+      raise DangerFrancisError, "lint_errors property is empty" if lint_errors.nil?
+      raise DangerFrancisError, "lint_warnings property is empty" if lint_warnings.nil?
     end
 
     def send_francis_request(json)

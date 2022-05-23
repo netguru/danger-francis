@@ -4,6 +4,7 @@
 
 AllCops:
   TargetRubyVersion: 2.6
+  NewCops: disable
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes

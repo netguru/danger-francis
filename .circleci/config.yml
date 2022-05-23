@@ -6,6 +6,7 @@ jobs:
   build:
     docker:
       - image: circleci/ruby:2.7
+    resource_class: small
     steps:
       - checkout
       - run: gem install bundler:2.2.10
