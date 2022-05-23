@@ -7,6 +7,5 @@ def android_outdated_dependencies
   dependencies = JSON.parse(rawDependenciesReport)
   total_dependencies_count = dependencies['count']
   outdated_dependencies_count = dependencies['outdated']['count']
-  puts "done"
   return { total: total_dependencies_count, outdated: outdated_dependencies_count }
 end
