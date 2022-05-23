@@ -18,7 +18,6 @@ jobs:
             set -e
             bundle exec rspec $(circleci tests glob "spec/**/**/*_spec.rb" | circleci tests split --split-by=timings) \
                               --format progress \
-                              --format RspecJunitFormatter \
                               --out test_results/rspec.xml
             ./tmp/cc-test-reporter format-coverage --prefix /app -t simplecov -o tmp/test-results/codeclimate.$(echo $CIRCLE_NODE_INDEX).json public/coverage/.resultset.json
       - run:
