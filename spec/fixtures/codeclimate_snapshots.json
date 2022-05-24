@@ -1,0 +1,27 @@
+{
+    "data": {
+        "attributes": {
+            "ratings": [
+                {
+                    "letter": "C"
+                }
+            ]
+        },
+        "meta": {
+            "issues_count": 6,
+            "measures": {
+                "remediation": {
+                    "value": 262.0
+                },
+                "technical_debt_ratio": {
+                    "value": 10.270369550217175,
+                    "meta": {
+                        "remediation_time": {
+                            "value": 262.0
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

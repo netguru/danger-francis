@@ -33,11 +33,11 @@ class CodeClimateClient
     debt_value = debt_ratio["value"]
     refactoring_time = debt_ratio["meta"]["remediation_time"]["value"]
 
-   [
+   {
       rating: rating,
       issues: issues,
       debt_value: debt_value,
       refactoring_time: refactoring_time
-    ]
+    }
   end
 end
