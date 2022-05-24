@@ -5,6 +5,7 @@ require_relative "ios_outdated"
 require_relative "flutter_outdated"
 require_relative "android_outdated"
 require_relative "gem_version"
+require_relative "code_climate_client"
 
 module Danger
   class DangerFrancisError < StandardError
