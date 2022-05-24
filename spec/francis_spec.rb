@@ -85,7 +85,7 @@ module Danger
       end
 
       it "Passed dependencies information is properly reported" do
-        prepare_plugin(true)
+        prepare_plugin(include_base_metrics: true)
         dependencies_count = rand(5...50)
         outdated_dependencies_count = rand(0...dependencies_count)
         @my_plugin.dependencies_count = dependencies_count
@@ -96,7 +96,7 @@ module Danger
       end
 
       it "Passed build time is properly reported" do
-        prepare_plugin(true)
+        prepare_plugin(include_base_metrics: true)
         build_time = rand(100...1000)
         @my_plugin.build_time = build_time
         @my_plugin.send_report
@@ -105,7 +105,7 @@ module Danger
       end
 
       it "Build time for Bitrise is properly calculated and reported" do
-        prepare_plugin(true)
+        prepare_plugin(include_base_metrics: true)
         @my_plugin.ci_type = "bitrise"
 
         current_timestamp = Time.now
