@@ -5,6 +5,8 @@ require_relative "ios_outdated"
 require_relative "flutter_outdated"
 require_relative "android_outdated"
 require_relative "gem_version"
+require_relative "code_climate_client"
+require_relative "francis_api_client"
 
 module Danger
   class DangerFrancisError < StandardError
@@ -27,7 +29,7 @@ module Danger
   # @tags netguru, francis, quality
   #
   class DangerFrancis < Plugin
-    # Url of the endpoint where report will be sent
+    # Base API Url for francis.
     attr_accessor :reporting_url
 
     # Stack of the project
@@ -61,6 +63,16 @@ module Danger
     # Number of outdated dependencies used in the project[optional]
     # Automatically calculated when stack = ios, flutter or android
     attr_accessor :outdated_dependencies_count
+
+    # Access token for codeclimate project
+    attr_accessor :codeclimate_token
+
+    # CodeClimate repository id
+    attr_accessor :codeclimate_repo_id
+
+    # Main branch for the project[optional]
+    # Default: master
+    attr_accessor :codeclimate_main_branch
 
     ### Calculated properties
 
@@ -96,7 +108,7 @@ module Danger
       return result
     end
 
-    def request_json
+    def danger_metrics_json
       {
         "project_id": project_id,
         "code_coverage": coverage.to_f,
@@ -115,6 +127,31 @@ module Danger
       }
     end
 
+    def codeclimate_metrics_json
+      client = CodeClimateClient.new
+      unless codeclimate_main_branch.nil?
+        client.branch = codeclimate_main_branch
+      end
+      client.token = codeclimate_token
+      client.repo_id = codeclimate_repo_id
+      status = client.status
+      {
+        "project_id": project_id,
+        "snapshot_id": status[:snapshot_id],
+        "overall_rating": status[:rating],
+        "total_refactoring_time": status[:refactoring_time],
+        "technical_debt": status[:debt_value],
+        "code_analysis_result": {
+          "total_issues": status[:issues],
+          "blocker_issues": 0,
+          "critical_issues": 0,
+          "major_issues": 0,
+          "minor_issues": 0
+        },
+        "pluginVersion": Francis::VERSION
+      }
+    end
+
     ### Methods
 
     # Sends the report to Francis
@@ -128,11 +165,15 @@ module Danger
       message "Linter warnings: #{lint_warnings}"
       message "Build time: #{(build_time_value / 60).to_i}min"
       message "Outdated dependencies count: #{dependencies_report[:outdated]} (out of #{dependencies_report[:total]} in total)"
-
+      francis_api_client = FrancisApiClient.new
+      francis_api_client.reporting_url = reporting_url
       begin
-        send_francis_request(request_json)
+        francis_api_client.send_danger_metrics(danger_metrics_json)
       rescue StandardError => e
-        message "Data NOT sent to Francis due to error: #{e.message}"
+        message "Danger Metrics NOT sent to Francis due to error: #{e.message}"
+      end
+      if !codeclimate_token.nil? && !codeclimate_repo_id.nil?
+        francis_api_client.send_codeclimate_metrics(codeclimate_metrics_json)
       end
     end
 
@@ -150,19 +191,6 @@ module Danger
       raise DangerFrancisError, "#{property} property is empty" if send(property.to_s).nil?
     end
 
-    def send_francis_request(json)
-      request = Typhoeus::Request.new(
-        reporting_url,
-        method: :post,
-        body: JSON.dump(json),
-        headers: { "Content-Type": "application/json" }
-      )
-      resp = request.run
-      unless resp.success?
-        warn("Send failed with code: #{resp.code} body: #{resp.body}")
-      end
-    end
-
-    private :build_time_value, :send_francis_request, :dependencies_report, :check_properties, :request_json
+    private :build_time_value, :dependencies_report, :check_properties, :danger_metrics_json, :codeclimate_metrics_json, :check_property
   end
 end

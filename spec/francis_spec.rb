@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require File.expand_path("spec_helper", __dir__)
+require_relative "mocks/codeclimate_mocks"
 
 # rubocop:disable Metrics/ModuleLength
 module Danger
@@ -13,12 +14,15 @@ module Danger
       before do
         @dangerfile = testing_dangerfile
         @my_plugin = @dangerfile.francis
+        Typhoeus::Expectation.clear
+        reponse = Typhoeus::Response.new(code: 200)
+        Typhoeus.stub(/fixture/).and_return(reponse)
       end
 
       def prepare_plugin(include_base_metrics: false)
         @my_plugin.reporting_url = "fixture"
         @my_plugin.stack = "ios"
-        @my_plugin.ci_type = "CircleCI"
+        @my_plugin.ci_type = "circleci"
         @my_plugin.project_id = "fixture"
         if include_base_metrics
           @my_plugin.coverage = 10
@@ -42,7 +46,7 @@ module Danger
           @my_plugin.send_report
         end.to raise_error(DangerFrancisError, "ci_type property is empty")
 
-        @my_plugin.ci_type = "CircleCI"
+        @my_plugin.ci_type = "circleci"
         expect do
           @my_plugin.send_report
         end.to raise_error(DangerFrancisError, "project_id property is empty")
@@ -119,9 +123,9 @@ module Danger
         expect(messages).to include("Build time: #{(build_time / 60).to_i}min")
       end
 
-      it "Data is properly sent to api" do
+      it "Danger data is properly sent to api" do
+        Typhoeus::Expectation.clear
         prepare_plugin
-        url = "fixture"
         coverage = rand(0.0...100.0)
         lint_errors = rand(0...100)
         lint_warnings = rand(0...100)
@@ -129,15 +133,15 @@ module Danger
         dependencies_count = rand(5...50)
         outdated_dependencies_count = rand(0...dependencies_count)
 
-        @my_plugin.reporting_url = url
+        @my_plugin.reporting_url = "fixture"
         @my_plugin.coverage = coverage
         @my_plugin.lint_errors = lint_errors
         @my_plugin.lint_warnings = lint_warnings
         @my_plugin.build_time = build_time
         @my_plugin.dependencies_count = dependencies_count
         @my_plugin.outdated_dependencies_count = outdated_dependencies_count
-
-        Typhoeus.stub(url) do |request|
+        all_expectations_fulfilled = false
+        Typhoeus.stub(/fixture/) do |request|
           body = JSON[request.options[:body]]
           expect(body["project_id"]).to eq("fixture")
           expect(body["code_coverage"]).to eq(coverage)
@@ -147,8 +151,36 @@ module Danger
           expect(body["dependencies"]["outdated_count"]).to eq(outdated_dependencies_count)
           expect(body["ci_data"]["build_time"]).to eq(build_time)
           expect(body["pluginVersion"]).to eq(Francis::VERSION)
+          all_expectations_fulfilled = true
+          Typhoeus::Response.new(code: 200)
         end
         @my_plugin.send_report
+        expect(all_expectations_fulfilled).to eq(true)
+      end
+
+      it "CodeClimate Data is sent to francis api" do
+        Typhoeus::Expectation.clear
+        prepare_plugin(include_base_metrics: true)
+        setup_codeclimate_mocks
+        reponse = Typhoeus::Response.new(code: 200)
+        Typhoeus.stub(/danger/).and_return(reponse)
+        @my_plugin.codeclimate_token = "fixture_token"
+        @my_plugin.codeclimate_repo_id = "fixture_repo_id"
+        all_expectations_fulfilled = false
+        Typhoeus.stub(%r{codeclimate/result}) do |request|
+          body = JSON[request.options[:body]]
+          expect(body["project_id"]).to eq("fixture")
+          expect(body["snapshot_id"]).to eq("fixture_id")
+          expect(body["overall_rating"]).to eq("C")
+          expect(body["total_refactoring_time"]).to eq(262.0)
+          expect(body["technical_debt"]).to eq(10.270369550217175)
+          expect(body["code_analysis_result"]["total_issues"]).to eq(6)
+          expect(body["pluginVersion"]).to eq(Francis::VERSION)
+          all_expectations_fulfilled = true
+          Typhoeus::Response.new(code: 200)
+        end
+        @my_plugin.send_report
+        expect(all_expectations_fulfilled).to eq(true)
       end
     end
   end

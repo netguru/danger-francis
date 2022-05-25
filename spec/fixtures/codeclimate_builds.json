@@ -1,0 +1,13 @@
+{
+    "data": [
+        {
+            "relationships": {
+                "snapshot": {
+                    "data": {
+                        "id": "fixture_id"
+                    }
+                }
+            }
+        }
+    ]
+}
