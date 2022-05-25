@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    danger-francis (0.1.4)
+    danger-francis (0.2.0)
       danger-plugin-api (~> 1.0)
       typhoeus (~> 1.4.0)
 

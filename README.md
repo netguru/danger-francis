@@ -13,7 +13,7 @@ Francis is Netguru internal tool for monitoring technical status of projects. Th
 
 #### Attributes
 
-`reporting_url` - Url of the endpoint where report will be sent
+`reporting_url` - Base API Url for francis.
 
 `stack` - Stack of the project
 Available values: android, ios, reactnative, flutter, ror, python
@@ -38,6 +38,12 @@ Automatically calculated when stack = ios, flutter or android
 `outdated_dependencies_count` - Number of outdated dependencies used in the project[optional]
 Automatically calculated when stack = ios, flutter or android
 
+`codeclimate_token` - Access token for codeclimate project
+
+`codeclimate_repo_id` - CodeClimate repository id
+
+`codeclimate_main_branch` - Main branch for the project[optional]
+Default: master
 
 ### Methods
 
