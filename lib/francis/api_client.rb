@@ -27,10 +27,9 @@ class ApiClient
       headers: headers
     )
     resp = request.run
-    unless resp.success?
+    if !resp.success?
       warn("Send failed with code: #{resp.code} body: #{resp.body}")
-    end
-    unless resp.body.nil?
+    elsif !resp.body.nil?
       return JSON.parse(resp.body)
     end
   end
