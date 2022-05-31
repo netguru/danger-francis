@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require File.expand_path("spec_helper", __dir__)
-require_relative "../lib/francis/code_climate_client"
+require_relative "../lib/francis/clients/code_climate_client"
 require_relative "mocks/codeclimate_mocks"
 
 describe CodeClimateClient do

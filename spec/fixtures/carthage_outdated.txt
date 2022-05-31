@@ -1,0 +1,6 @@
+Please update to the latest Carthage version: 0.38.0. You currently are on 0.37.0
+*** Fetching xcconfigs
+The following dependencies are outdated:
+lib1 "0.7" -> "0.7" (Latest: "0.8")
+lib3 "0.7" -> "0.7" (Latest: "0.8")
+lib4 "0.7" -> "0.7" (Latest: "0.8")

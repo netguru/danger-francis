@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require "typhoeus"
-require_relative "ios_outdated"
-require_relative "flutter_outdated"
-require_relative "android_outdated"
+require_relative "outdated/ios_outdated"
+require_relative "outdated/flutter_outdated"
+require_relative "outdated/android_outdated"
 require_relative "gem_version"
-require_relative "code_climate_client"
-require_relative "francis_api_client"
+require_relative "clients/code_climate_client"
+require_relative "clients/francis_api_client"
 
 module Danger
   class DangerFrancisError < StandardError
@@ -98,7 +98,7 @@ module Danger
 
       case stack
       when "ios"
-        result = ios_outdated_dependencies
+        result = IOSOutdated.new(self).outdated
       when "flutter"
         result = flutter_outdated_dependencies
       when "android"
