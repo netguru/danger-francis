@@ -2,6 +2,7 @@
 
 require File.expand_path("spec_helper", __dir__)
 require_relative "mocks/codeclimate_mocks"
+require_relative "mocks/ruby_outdated_mocks"
 
 # rubocop:disable Metrics/ModuleLength
 module Danger
@@ -181,6 +182,17 @@ module Danger
         end
         @my_plugin.send_report
         expect(all_expectations_fulfilled).to eq(true)
+      end
+
+      it "No error is thrown when stack is ruby" do
+        setup_ruby_outdated_mocks
+        prepare_plugin(include_base_metrics: true)
+        @my_plugin.stack = "ruby"
+        @my_plugin.build_time = 10
+        @my_plugin.send_report
+        messages = @dangerfile.status_report[:messages]
+
+        expect(messages).to include("Outdated dependencies count: 3 (out of 4 in total)")
       end
     end
   end

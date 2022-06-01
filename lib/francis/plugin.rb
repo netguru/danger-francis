@@ -4,6 +4,7 @@ require "typhoeus"
 require_relative "outdated/ios_outdated"
 require_relative "outdated/flutter_outdated"
 require_relative "outdated/android_outdated"
+require_relative "outdated/ruby_outdated"
 require_relative "gem_version"
 require_relative "clients/code_climate_client"
 require_relative "clients/francis_api_client"
@@ -33,7 +34,7 @@ module Danger
     attr_accessor :reporting_url
 
     # Stack of the project
-    # Available values: android, ios, reactnative, flutter, ror, python
+    # Available values: android, ios, reactnative, flutter, ruby, python
     attr_accessor :stack
 
     # CI type
@@ -57,11 +58,11 @@ module Danger
     attr_accessor :build_time
 
     # Number of dependencies used in the project[optional]
-    # Automatically calculated when stack = ios, flutter or android
+    # Automatically calculated when stack = ios, flutter, android or ruby
     attr_accessor :dependencies_count
 
     # Number of outdated dependencies used in the project[optional]
-    # Automatically calculated when stack = ios, flutter or android
+    # Automatically calculated when stack = ios, flutter, android or ruby
     attr_accessor :outdated_dependencies_count
 
     # Access token for codeclimate project
@@ -102,7 +103,9 @@ module Danger
       when "flutter"
         result = flutter_outdated_dependencies
       when "android"
-        return android_outdated_dependencies
+        result = android_outdated_dependencies
+      when "ruby"
+        result = RubyOutdated.new(self).outdated
       end
 
       return result
