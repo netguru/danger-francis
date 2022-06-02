@@ -13,14 +13,15 @@ describe RubyOutdated do
   it "Ruby outdated dependencies information is properly returned" do
     setup_ruby_outdated_mocks
     result = RubyOutdated.new(@my_plugin).outdated
-    expect(result[:total]).to eq(4)
+    expect(result[:total]).to eq(5)
     expect(result[:outdated]).to eq(3)
   end
 
-  it "Ruby outdated dependencies information is properly returned when nothing to update" do
-    setup_ruby_outdated_noting_to_update_mocks
+  it "When Gemfile is missing proper message should be logged" do
+    allow(File).to receive(:exist?).with("Gemfile").and_return(false)
+    allow(Logger).to receive(:log) do |message|
+      expect(message).to eq("Gemfile not found")
+    end
     result = RubyOutdated.new(@my_plugin).outdated
-    expect(result[:total]).to eq(4)
-    expect(result[:outdated]).to eq(0)
   end
 end
