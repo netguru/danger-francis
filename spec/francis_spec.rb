@@ -192,7 +192,7 @@ module Danger
         @my_plugin.send_report
         messages = @dangerfile.status_report[:messages]
 
-        expect(messages).to include("Outdated dependencies count: 3 (out of 4 in total)")
+        expect(messages).to include("Outdated dependencies count: 3 (out of 5 in total)")
       end
     end
   end

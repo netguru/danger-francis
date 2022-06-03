@@ -75,6 +75,10 @@ module Danger
     # Default: master
     attr_accessor :codeclimate_main_branch
 
+    ### private properties
+
+    attr_accessor :dependencies_report
+
     ### Calculated properties
 
     def build_time_value
@@ -88,27 +92,6 @@ module Danger
         return current_timestamp.to_i - build_start_timestamp.to_i
       end
       return 0
-    end
-
-    def dependencies_report
-      unless dependencies_count.nil? || outdated_dependencies_count.nil?
-        return { total: dependencies_count, outdated: outdated_dependencies_count }
-      end
-
-      result = { total: 0, outdated: 0 }
-
-      case stack
-      when "ios"
-        result = IOSOutdated.new(self).outdated
-      when "flutter"
-        result = flutter_outdated_dependencies
-      when "android"
-        result = android_outdated_dependencies
-      when "ruby"
-        result = RubyOutdated.new(self).outdated
-      end
-
-      return result
     end
 
     def danger_metrics_json
@@ -162,6 +145,7 @@ module Danger
     # @return  [void]
     def send_report
       check_properties
+      generate_dependencies_report
       message "Sending project state-of-health report to Francis"
       message "Code coverage: #{coverage.round(2)}%"
       message "Linter errors: #{lint_errors}"
@@ -188,6 +172,27 @@ module Danger
       check_property(:coverage)
       check_property(:lint_errors)
       check_property(:lint_warnings)
+    end
+
+    def generate_dependencies_report
+      unless dependencies_count.nil? || outdated_dependencies_count.nil?
+        @dependencies_report = { total: dependencies_count, outdated: outdated_dependencies_count }
+        return
+      end
+
+      result = { total: 0, outdated: 0 }
+
+      case stack
+      when "ios"
+        result = IOSOutdated.new(self).outdated
+      when "flutter"
+        result = flutter_outdated_dependencies
+      when "android"
+        result = android_outdated_dependencies
+      when "ruby"
+        result = RubyOutdated.new(self).outdated
+      end
+      @dependencies_report = result
     end
 
     def check_property(property)

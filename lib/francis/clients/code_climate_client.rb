@@ -30,7 +30,7 @@ class CodeClimateClient
     issues = snapshot["meta"]["issues_count"]
     debt_ratio = snapshot["meta"]["measures"]["technical_debt_ratio"]
     debt_value = debt_ratio["value"]
-    refactoring_time = debt_ratio["meta"]["remediation_time"]["value"]
+    refactoring_time = debt_ratio["meta"]["remediation_time"]["value"].to_i
 
     {
       snapshot_id: snapshot_id,
