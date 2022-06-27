@@ -13,8 +13,11 @@ class CodeClimateClient
     "Token token=#{token}"
   end
 
-  def builds
-    builds_url = "https://api.codeclimate.com/v1/repos/#{repo_id}/builds?filter[state]=complete&filter[local_ref]=refs/heads/#{branch}"
+  def builds(branch_name)
+    builds_url = "https://api.codeclimate.com/v1/repos/#{repo_id}/builds?filter[state]=complete"
+    unless branch_name.nil?
+      builds_url += "&filter[local_ref]=#{branch_name}"
+    end
     ApiClient.get(builds_url, authorization)
   end
 
@@ -24,7 +27,14 @@ class CodeClimateClient
   end
 
   def status
-    snapshot_id = builds["data"][0]["relationships"]["snapshot"]["data"]["id"]
+    snapshot_id = begin
+      builds("refs/heads/#{branch}")["data"][0]["relationships"]["snapshot"]["data"]["id"]
+    rescue StandardError
+      true
+    end
+    if snapshot_id == true
+      snapshot_id = builds(nil)["data"][0]["relationships"]["snapshot"]["data"]["id"]
+    end
     snapshot = snapshot(snapshot_id)["data"]
     rating = snapshot["attributes"]["ratings"][0]["letter"]
     issues = snapshot["meta"]["issues_count"]
